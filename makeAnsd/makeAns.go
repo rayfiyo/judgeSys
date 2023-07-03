@@ -14,7 +14,7 @@ func main() {
 	fileName = "ac"
 
 	cmdRun("gcc " + fileName + ".c -o " + fileName + ".out")
-	cmdRun("echo \"" + "0" + "\" > " + "ans.txt") // ans.txt の初期化(WAの0)
+	cmdRun("echo \"" + "1" + "\" > " + "ans.txt") // ans.txt の初期化(比較時はWAなので1)
 	for _, testCase := range testCase() {
 		cmdRun("echo \"" + testCase + "\" | ./" + fileName + ".out >> " + "ans.txt")
 	}

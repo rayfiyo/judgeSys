@@ -7,10 +7,10 @@ Not sure if it is useful for anyone but me.
 ---
 # Usage
 
-# ansMaker
+# makeAns
 以下のディレクトリ構成を含むとき
 ~~~
-ac.c ansMaker sample.txt
+ac.c makeAns sample.txt
 ~~~
 ./ansMaker を実行すると ans.txt が生成される。
 このテキストファイルの中身は、 sample.txt を入力としたときの ac.c の出力結果である。
