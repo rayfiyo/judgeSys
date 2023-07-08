@@ -6,12 +6,15 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func main() {
 	var fileName string
-	// fmt.Printf("file name:")
-	fileName = (os.Args[1])                                                            // fmt.Scanln(&fileName)
+	fileName = (os.Args[1])
+	if fileName[len(fileName)-2:] == ".c" { // len は 1-based index
+		fileName = fileName[:len(fileName)-2] // len は 1-based index
+	}
 	exec.Command("bash", "-c", "echo \""+"1"+"\" > "+fileName+".txt").CombinedOutput() // 依存無しでWA(= 1)と書き込み
 
 	cmdRun(fileName, "bash", "-c", "gcc ./"+fileName+".c -o ./"+fileName+".out")
@@ -20,13 +23,12 @@ func main() {
 	}
 	cmdRun(fileName, "diff", "-q", "ans.txt", fileName+".txt")             // 回答との差分比較
 	cmdRun(fileName, "bash", "-c", "sed -i 's/1/0/1' "+fileName+".txt")    // ACしたことを書き込み(= 先頭の1を0にする)
-	cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物削除
+	cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
 	fmt.Printf("Judge system done.")
 	fmt.Println("<br>")
 }
 
 func cmdRun(fileName string, cmd ...string) {
-	//cmdSplited := strings.Split(cmd, ",")
 	var fullCmd *exec.Cmd
 	if len(cmd) == 1 {
 		fullCmd = exec.Command(cmd[0])
@@ -35,7 +37,9 @@ func cmdRun(fileName string, cmd ...string) {
 	}
 	output, err := fullCmd.CombinedOutput()
 	if err != nil {
-		addMessage := "fullCmd: " + fullCmd +"<br>\n" + "output: " + output + "<br>\n" + "err: " + err + "<br>\n"
+		printCmd := fullCmd.String()                           // 型変換
+		printOutput := strings.TrimRight(string(output), "\n") // 改行削除
+		addMessage := "fullCmd: " + printCmd + "<br>\n" + "output: " + printOutput + "<br>\n" + "err: " + err.Error() + "<br>\n"
 		errProcess(err, fileName, "err1: シェルコマンド実行エラー", addMessage)
 		log.Fatal("Judge system done, but not AC.")
 	}
@@ -75,24 +79,25 @@ func testCase(fileName string) []string {
 }
 
 func errProcess(errMessage error, fileName, errCode, addMessage string) {
-	//file, err := os.Open(fileName + ".txt")
 	file, err := os.OpenFile(fileName+".txt", os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
+		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
-		log.Fatal("err4: エラーを書き込むファイル展開に失敗")
+		log.Fatal("err4: エラーを書き込むファイル展開に失敗<br>")
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(fmt.Sprintln(errMessage))
 	_, err = file.WriteString(fmt.Sprintln(addMessage))
 	if err != nil {
+		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
-		log.Fatal("err5: エラーメッセージの書き込み失敗")
+		log.Fatal("err5: エラーメッセージの書き込み失敗<br>")
 	}
-
 	_, err = file.WriteString(fmt.Sprintln(errCode))
 	if err != nil {
+		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
-		log.Fatal("err6: エラーコードの書き込み失敗")
+		log.Fatal("err6: エラーコードの書き込み失敗<br>")
 	}
 }

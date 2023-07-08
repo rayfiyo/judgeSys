@@ -12,7 +12,7 @@ Not sure if it is useful for anyone but me.
 ~~~
 ac.c makeAns sample.txt
 ~~~
-./ansMaker を実行すると ans.txt が生成される。
+./makeAns を実行すると ans.txt が生成される。
 このテキストファイルの中身は、 sample.txt を入力としたときの ac.c の出力結果である。
 
 # compile
@@ -22,3 +22,4 @@ ans.txt compile sample.txt 2023-06-12.c
 ~~~
 ./compile を実行すると 2023-06-12.txt が生成される。
 このテキストファイルの中身は、 sample.txt を入力したときの 2023-06-12.c の出力結果 や エラー 実行結果(0/1) などである。
+ans.txt と比較し、実行結果も記載する
