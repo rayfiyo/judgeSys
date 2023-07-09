@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -17,13 +18,13 @@ func main() {
 	}
 	exec.Command("bash", "-c", "echo \""+"1"+"\" > "+fileName+".txt").CombinedOutput() // 依存無しでWA(= 1)と書き込み
 
-	cmdRun(fileName, "bash", "-c", "gcc ./"+fileName+".c -o ./"+fileName+".out")
+	cmdRun(fileName, "bash", "-c", "gcc "+fileName+".c -o "+fileName+".out")
 	for _, testCase := range testCase(fileName) {
 		cmdRun(fileName, "bash", "-c", "echo \""+testCase+"\" | ./"+fileName+".out >> "+fileName+".txt")
 	}
-	cmdRun(fileName, "diff", "-q", "ans.txt", fileName+".txt")             // 回答との差分比較
-	cmdRun(fileName, "bash", "-c", "sed -i 's/1/0/1' "+fileName+".txt")    // ACしたことを書き込み(= 先頭の1を0にする)
-	cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
+	cmdRun(fileName, "diff", "-q", "ans.txt", fileName+".txt")          // 回答との差分比較
+	cmdRun(fileName, "bash", "-c", "sed -i '1s/1/0/' "+fileName+".txt") // ACしたことを書き込み(= 先頭の1を0にする)
+	cmdRun(fileName, "rm", fileName+".c", fileName+".out")              // 副産物ファイル削除
 	fmt.Printf("Judge system done.")
 	fmt.Println("<br>")
 }
@@ -55,23 +56,29 @@ func testCase(fileName string) []string {
 	defer file.Close()
 
 	sc := bufio.NewScanner(file)
-	var sample []string
+	sc.Scan()
+	size, err := strconv.Atoi(sc.Text())
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal("err3: 入力文字をint型に変換失敗")
+	}
 
-	// 二行で1空白区切りスライス
-	for sc.Scan() {
-		line1 := sc.Text()
-		if !sc.Scan() {
-			break
+	sample := make([]string, size)
+	for i := 0; i < size; { //入力できる間
+		sc.Scan()
+		text := sc.Text()
+		if text != "" {
+			sample[i] += text + " "
+		} else if len(sample[i]) > 0 { // 1ケースが終わったとき
+			sample[i] = sample[i][:len(sample[i])-1] // ケツのスペース消す
+			i++
 		}
-		line2 := sc.Text()
-
-		sample = append(sample, line1+" "+line2)
 	}
 
 	if err := sc.Err(); err != nil {
-		fmt.Printf("err3: テストケース読み込みエラー")
+		fmt.Printf("err4: テストケース読み込みエラー")
 		fmt.Println("<br>")
-		errProcess(err, fileName, "err3: テストケース読み込みエラー", "")
+		errProcess(err, fileName, "err4: テストケース読み込みエラー", "")
 		log.Fatal("エラー処理終了")
 	}
 
@@ -83,7 +90,7 @@ func errProcess(errMessage error, fileName, errCode, addMessage string) {
 	if err != nil {
 		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
-		log.Fatal("err4: エラーを書き込むファイル展開に失敗<br>")
+		log.Fatal("err5: エラーを書き込むファイル展開に失敗<br>")
 	}
 	defer file.Close()
 
@@ -92,12 +99,12 @@ func errProcess(errMessage error, fileName, errCode, addMessage string) {
 	if err != nil {
 		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
-		log.Fatal("err5: エラーメッセージの書き込み失敗<br>")
+		log.Fatal("err6: エラーメッセージの書き込み失敗<br>")
 	}
 	_, err = file.WriteString(fmt.Sprintln(errCode))
 	if err != nil {
 		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
-		log.Fatal("err6: エラーコードの書き込み失敗<br>")
+		log.Fatal("err7: エラーコードの書き込み失敗<br>")
 	}
 }
