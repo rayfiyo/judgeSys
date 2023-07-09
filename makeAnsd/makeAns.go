@@ -37,7 +37,8 @@ func cmdRun(cmd string) {
 func testCase() []string {
 	file, err := os.Open("sample.txt")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		log.Fatal("err2: エラーを書き込むファイル展開に失敗")
 	}
 	defer file.Close()
 
@@ -45,7 +46,8 @@ func testCase() []string {
 	sc.Scan()
 	size, err := strconv.Atoi(sc.Text())
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		log.Fatal("err3: 入力文字をint型に変換失敗")
 	}
 
 	sample := make([]string, size)
@@ -62,7 +64,7 @@ func testCase() []string {
 	}
 
 	if err := sc.Err(); err != nil {
-		log.Fatal("err2: テストケース読み込みエラー")
+		log.Fatal("err4: テストケース読み込みエラー")
 	}
 
 	return sample
