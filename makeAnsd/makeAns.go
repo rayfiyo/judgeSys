@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 )
 
 func main() {
@@ -16,7 +17,7 @@ func main() {
 	cmdRun("gcc " + fileName + ".c -o " + fileName + ".out")
 	cmdRun("echo \"" + "1" + "\" > " + "ans.txt") // ans.txt の初期化(比較時はWAなので1)
 	for _, testCase := range testCase() {
-		cmdRun("echo \"" + testCase + "\" | ./" + fileName + ".out >> " + "ans.txt")
+		cmdRun("echo \"" + string(testCase) + "\" | ./" + fileName + ".out >> " + "ans.txt")
 	}
 	cmdRun("rm ./" + fileName + ".out") // 実行ファイル削除
 	fmt.Println("作成が完了しました。")
@@ -41,17 +42,23 @@ func testCase() []string {
 	defer file.Close()
 
 	sc := bufio.NewScanner(file)
-	var sample []string
+	sc.Scan()
+	size, err := strconv.Atoi(sc.Text())
+	if err != nil {
+		panic(err)
+	}
 
-	// 二行で1空白区切りスライス
-	for sc.Scan() {
-		line1 := sc.Text()
-		if !sc.Scan() {
-			break
+	sample := make([]string, size)
+
+	for i := 0; i < size; { //入力できる間
+		sc.Scan()
+		text := sc.Text()
+		if text != "" {
+			sample[i] += text + " "
+		} else if len(sample[i]) > 0 { // 1ケースが終わったとき
+			sample[i] = sample[i][:len(sample[i])-1] // ケツのスペース消す
+			i++
 		}
-		line2 := sc.Text()
-
-		sample = append(sample, line1+" "+line2)
 	}
 
 	if err := sc.Err(); err != nil {
