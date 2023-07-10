@@ -13,19 +13,21 @@ import (
 func main() {
 	var fileName string
 	fileName = (os.Args[1])
-	if fileName[len(fileName)-2:] == ".c" { // len は 1-based index
-		fileName = fileName[:len(fileName)-2] // len は 1-based index
+	// .c ついてたら消す、len() は 1-based index に注意
+	if fileName[len(fileName)-2:] == ".c" {
+		fileName = fileName[:len(fileName)-2]
 	}
-	exec.Command("bash", "-c", "echo \""+"1"+"\" > "+fileName+".txt").CombinedOutput() // 依存無しでWA(= 1)と書き込み
+	// .Run() は、エラー(エラーコード)のみ出力
+	exec.Command("bash", "-c", "echo \""+"1"+"\" > "+fileName+".txt").Run() // 依存無しでWA(= 1)と書き込み
 
-	cmdRun(fileName, "bash", "-c", "gcc "+fileName+".c -o "+fileName+".out")
+	cmdRun("fileName", "/usr/bin/gcc", fileName+".c", "-o", fileName+".out")
 	for _, testCase := range testCase(fileName) {
 		cmdRun(fileName, "bash", "-c", "echo \""+testCase+"\" | ./"+fileName+".out >> "+fileName+".txt")
 	}
 	cmdRun(fileName, "diff", "-q", "ans.txt", fileName+".txt")          // 回答との差分比較
 	cmdRun(fileName, "bash", "-c", "sed -i '1s/1/0/' "+fileName+".txt") // ACしたことを書き込み(= 先頭の1を0にする)
 	cmdRun(fileName, "rm", fileName+".c", fileName+".out")              // 副産物ファイル削除
-	fmt.Printf("Judge system done.")
+	fmt.Printf("Judge system done, and AC.")
 	fmt.Println("<br>")
 }
 
@@ -42,7 +44,7 @@ func cmdRun(fileName string, cmd ...string) {
 		printOutput := strings.TrimRight(string(output), "\n") // 改行削除
 		addMessage := "fullCmd: " + printCmd + "<br>\n" + "output: " + printOutput + "<br>\n" + "err: " + err.Error() + "<br>\n"
 		errProcess(err, fileName, "err1: シェルコマンド実行エラー", addMessage)
-		log.Fatal("Judge system done, but not AC.")
+		log.Fatal("Judge system done, but WA.")
 	}
 	fmt.Println(string(output))
 }
