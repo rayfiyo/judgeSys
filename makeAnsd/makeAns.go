@@ -21,6 +21,8 @@ func main() {
 	}
 	cmdRun("rm ./" + fileName + ".out") // 実行ファイル削除
 	fmt.Println("作成が完了しました。")
+	fmt.Println("ans.txt が出力されているはずです。以下はディレクトリの例です。")
+	fmt.Println("ac.c  ans.txt  index.php  makeAns  sample.txt  send1-1.php")
 }
 
 func cmdRun(cmd string) {
