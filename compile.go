@@ -20,7 +20,7 @@ func main() {
 	// .Run() は、エラー(エラーコード)のみ出力
 	exec.Command("bash", "-c", "echo \""+"1"+"\" > "+fileName+".txt").Run() // 依存無しでWA(= 1)と書き込み
 
-	cmdRun("fileName", "/usr/bin/gcc", fileName+".c", "-o", fileName+".out")
+	cmdRun("fileName", "/usr/bin/gcc", fileName+".c", "-lm", "-o", fileName+".out")
 	for _, testCase := range testCase(fileName) {
 		cmdRun(fileName, "bash", "-c", "echo \""+testCase+"\" | ./"+fileName+".out >> "+fileName+".txt")
 	}

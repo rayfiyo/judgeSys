@@ -2,36 +2,57 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 func main() {
 	var fileName string
-	fmt.Printf("ac.c を実行します:")
 	fileName = "ac"
 
-	cmdRun("gcc " + fileName + ".c -o " + fileName + ".out")
-	cmdRun("echo \"" + "1" + "\" > " + "ans.txt") // ans.txt の初期化(比較時はWAなので1)
+	fmt.Println("ls コマンド:")
+	rawOutput, _ := exec.Command("ls").Output()
+	fmt.Println(strings.Join(strings.Fields(string(bytes.TrimRight(rawOutput, "\n"))), "  ")) // 整形
+
+	fmt.Println("ディレクトリの構成例(makeAns抜き): ")
+	fmt.Println("ac.c  index.php  sample.txt  send.php")
+
+	fmt.Printf("何か入力後、実行: ")
+	var input string
+	fmt.Scanln(&input)
+
+	fmt.Printf("実行コマンド: ")
+	cmdRun("fileName", "/usr/bin/gcc", fileName+".c", "-lm", "-o", fileName+".out")
+	cmdRun(fileName, "bash", "-c", "echo \""+"1"+"\" > "+"ans.txt") // ans.txt の初期化(比較時はWAなので1)
 	for _, testCase := range testCase() {
-		cmdRun("echo \"" + string(testCase) + "\" | ./" + fileName + ".out >> " + "ans.txt")
+		cmdRun(fileName, "bash", "-c", "echo \""+testCase+"\" | ./"+fileName+".out >> "+"ans.txt")
 	}
-	cmdRun("rm ./" + fileName + ".out") // 実行ファイル削除
-	fmt.Println("作成が完了しました。")
-	fmt.Println("ans.txt が出力されているはずです。以下はディレクトリの例です。")
-	fmt.Println("ac.c  ans.txt  index.php  makeAns  sample.txt  send1-1.php")
+	cmdRun(fileName, "rm", fileName+".out") // 実行ファイル削除
+	fmt.Println("ans.txt の作成完了")
+	fmt.Println("ディレクトリの構成例(makeAnsあり)")
+	fmt.Println("ac.c  ans.txt  index.php  makeAns  sample.txt  send.php")
 }
 
-func cmdRun(cmd string) {
-	fullCmd := exec.Command("bash", "-c", cmd)
+func cmdRun(fileName string, cmd ...string) {
+	var fullCmd *exec.Cmd
+	if len(cmd) == 1 {
+		fullCmd = exec.Command(cmd[0])
+	} else {
+		fullCmd = exec.Command(cmd[0], cmd[1:]...)
+	}
 	fmt.Println(fullCmd)
 	output, err := fullCmd.CombinedOutput()
 	if err != nil {
-		fmt.Println(err)
-		log.Fatal("err1: コマンド実行エラー")
+		printCmd := fullCmd.String()                           // 型変換
+		printOutput := strings.TrimRight(string(output), "\n") // 改行削除
+		addMessage := "fullCmd: " + printCmd + "<br>\n" + "output: " + printOutput + "<br>\n" + "err: " + err.Error() + "<br>\n"
+		fmt.Println(err, fileName, "err1: シェルコマンド実行エラー", addMessage)
+		log.Fatal("Judge system done, but WA.")
 	}
 	fmt.Println(string(output))
 }
