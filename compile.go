@@ -23,6 +23,7 @@ func main() {
 	cmdRun("fileName", "/usr/bin/gcc", fileName+".c", "-lm", "-o", fileName+".out")
 	for _, testCase := range testCase(fileName) {
 		cmdRun(fileName, "bash", "-c", "echo \""+testCase+"\" | ./"+fileName+".out >> "+fileName+".txt")
+		// exec.Command("bash", "-c", "echo \""+testCase+"\" | ./"+fileName+".out >> "+fileName+".txt").Run() // 変形無しで書き込み
 	}
 	cmdRun(fileName, "diff", "-q", "ans.txt", fileName+".txt")          // 回答との差分比較
 	cmdRun(fileName, "bash", "-c", "sed -i '1s/1/0/' "+fileName+".txt") // ACしたことを書き込み(= 先頭の1を0にする)
@@ -38,6 +39,7 @@ func cmdRun(fileName string, cmd ...string) {
 	} else {
 		fullCmd = exec.Command(cmd[0], cmd[1:]...)
 	}
+	// fullCmd.CombinedOutput()
 	output, err := fullCmd.CombinedOutput()
 	if err != nil {
 		printCmd := fullCmd.String()                           // 型変換
@@ -65,7 +67,23 @@ func testCase(fileName string) []string {
 		log.Fatal("err3: 入力文字をint型に変換失敗")
 	}
 
-	sample := make([]string, size)
+	var sample []string
+	var currentCase string
+	for i := 0; i < size; { //入力できる間
+		sc.Scan()
+		text := sc.Text()
+		if text == "" {
+			if len(currentCase) > 0 {
+				sample = append(sample, currentCase[:len(currentCase)-1]) // ケツのスペース消す
+				currentCase = ""
+				i++
+			}
+		} else {
+			currentCase += text + " "
+		}
+	}
+
+	/*sample := make([]string, size)
 	for i := 0; i < size; { //入力できる間
 		sc.Scan()
 		text := sc.Text()
@@ -75,7 +93,7 @@ func testCase(fileName string) []string {
 			sample[i] = sample[i][:len(sample[i])-1] // ケツのスペース消す
 			i++
 		}
-	}
+	}*/
 
 	if err := sc.Err(); err != nil {
 		fmt.Printf("err4: テストケース読み込みエラー")
@@ -90,7 +108,7 @@ func testCase(fileName string) []string {
 func errProcess(errMessage error, fileName, errCode, addMessage string) {
 	file, err := os.OpenFile(fileName+".txt", os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
-		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
+		cmdRun(fileName, "rm", fileName+".c", fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
 		log.Fatal("err5: エラーを書き込むファイル展開に失敗<br>")
 	}
@@ -99,14 +117,16 @@ func errProcess(errMessage error, fileName, errCode, addMessage string) {
 	_, err = file.WriteString(fmt.Sprintln(errMessage))
 	_, err = file.WriteString(fmt.Sprintln(addMessage))
 	if err != nil {
-		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
+		cmdRun(fileName, "rm", fileName+".c", fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
 		log.Fatal("err6: エラーメッセージの書き込み失敗<br>")
 	}
 	_, err = file.WriteString(fmt.Sprintln(errCode))
 	if err != nil {
-		cmdRun(fileName, "bash", "-c", "rm ./"+fileName+".c "+fileName+".out") // 副産物ファイル削除
+		cmdRun(fileName, "rm", fileName+".c", fileName+".out") // 副産物ファイル削除
 		fmt.Println(err)
 		log.Fatal("err7: エラーコードの書き込み失敗<br>")
 	}
+
+	cmdRun(fileName, "rm", fileName+".c", fileName+".out") // 副産物ファイル削除
 }
