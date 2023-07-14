@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
+	//"strings"
 )
 
 func main() {
@@ -39,16 +39,17 @@ func cmdRun(fileName string, cmd ...string) {
 	} else {
 		fullCmd = exec.Command(cmd[0], cmd[1:]...)
 	}
-	// fullCmd.CombinedOutput()
-	output, err := fullCmd.CombinedOutput()
-	if err != nil {
-		printCmd := fullCmd.String()                           // 型変換
-		printOutput := strings.TrimRight(string(output), "\n") // 改行削除
-		addMessage := "fullCmd: " + printCmd + "<br>\n" + "output: " + printOutput + "<br>\n" + "err: " + err.Error() + "<br>\n"
-		errProcess(err, fileName, "err1: シェルコマンド実行エラー", addMessage)
-		log.Fatal("Judge system done, but WA.")
-	}
-	fmt.Println(string(output))
+	fullCmd.CombinedOutput() /*
+		output, err := fullCmd.CombinedOutput()
+		if err != nil {
+			printCmd := fullCmd.String()                           // 型変換
+			printOutput := strings.TrimRight(string(output), "\n") // 改行削除
+			addMessage := "fullCmd: " + printCmd + "<br>\n" + "output: " + printOutput + "<br>\n" + "err: " + err.Error() + "<br>\n"
+			errProcess(err, fileName, "err1: シェルコマンド実行エラー", addMessage)
+			log.Fatal("Judge system done, but WA.")
+		}
+		fmt.Println(string(output))
+		//*/
 }
 
 func testCase(fileName string) []string {
