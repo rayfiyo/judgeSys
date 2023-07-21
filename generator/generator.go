@@ -19,8 +19,10 @@ func main() {
 	rawOutput, _ := exec.Command("ls").Output()
 	fmt.Println(strings.Join(strings.Fields(string(bytes.TrimRight(rawOutput, "\n"))), "  ")) // 整形
 
-	fmt.Println("ディレクトリの構成例(makeAns抜き): ")
-	fmt.Println("ac.c  index.php  sample.txt  send.php")
+	fmt.Println("ディレクトリの構成例: ")
+	fmt.Println("ac.c  ans.txt  index.html  sample.txt  send.php")
+	fmt.Println("ac.c  index.html  sample.txt  send.php")
+	fmt.Println("ac.c generator sample.txt")
 
 	fmt.Printf("何か入力後、実行: ")
 	var input string

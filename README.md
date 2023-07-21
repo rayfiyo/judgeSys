@@ -7,10 +7,10 @@ Not sure if it is useful for anyone but me.<br>
 ---
 # Usage
 
-## makeAns
+## generator
 以下のディレクトリ構成を含むとき
 ~~~
-ac.c makeAns sample.txt
+ac.c generator sample.txt
 ~~~
 ./makeAns を実行すると ans.txt が生成される。
 このテキストファイルの中身は、 sample.txt を入力としたときの ac.c の出力結果である。
@@ -18,7 +18,7 @@ ac.c makeAns sample.txt
 ## compile
 以下のディレクトリ構成を含むとき
 ~~~
-ans.txt compile sample.txt 2023-06-12.c
+ans.txt judge sample.txt 2023-06-12.c
 ~~~
 ./compile を実行すると 2023-06-12.txt が生成される。
 このテキストファイルの中身は、 sample.txt を入力したときの 2023-06-12.c の出力結果 や エラー 実行結果(0/1) などである。
