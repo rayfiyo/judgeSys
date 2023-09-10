@@ -54,7 +54,7 @@ func cmdRun(fileName string, cmd ...string) {
 			cRunning = true
 		}
 	} else { // len(cmd) < 1
-		log.Fatalf("Error Code: %d\nError Message: cmdRunの引数不足", cmdRunArg)
+		log.Panicf("Error Code: %d\nError Message: cmdRunの引数不足", cmdRunArg)
 	}
 	output, err := fullCmd.CombinedOutput()
 
@@ -125,7 +125,7 @@ func errProcess(defaultErr error, errCode int, nameOrMessage ...string) {
 		errMessage = nameOrMessage[0]
 		fileName = nameOrMessage[1]
 	} else {
-		log.Fatalf("Error Code: %d\nError Message: エラー処理の引数が多い\n", errProcessManyArg)
+		log.Panicf("Error Code: %d\nError Message: エラー処理の引数が多い\n", errProcessManyArg)
 	}
 	errText := "<br>\n" +
 		"err:           " + defaultErr.Error() + " <br>\n" +
@@ -138,14 +138,14 @@ func errProcess(defaultErr error, errCode int, nameOrMessage ...string) {
 	defer file.Close()
 	if err != nil {
 		fmt.Println(err)
-		log.Fatalf("Error Code: %d\nError Message: エラーを書き込むファイルの展開に失敗\n", errProcessOpen)
+		log.Panicf("Error Code: %d\nError Message: エラーを書き込むファイルの展開に失敗\n", errProcessOpen)
 	}
 
 	_, err = file.WriteString(fmt.Sprintf(errText))
 	if err != nil {
 		fmt.Println(err)
-		log.Fatalf("Error Code: %d\nError Message: エラーメッセージの書き込みに失敗\n", errProcessMessage)
+		log.Panicf("Error Code: %d\nError Message: エラーメッセージの書き込みに失敗\n", errProcessMessage)
 	}
 
-	log.Fatalf(errText)
+	log.Panicf(errText)
 }

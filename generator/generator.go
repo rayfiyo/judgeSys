@@ -54,7 +54,7 @@ func cmdRun(fileName string, cmd ...string) {
 		printOutput := strings.TrimRight(string(output), "\n") // 改行削除
 		addMessage := "fullCmd: " + printCmd + "<br>\n" + "output: " + printOutput + "<br>\n" + "err: " + err.Error() + "<br>\n"
 		fmt.Println(err, fileName, "err1: シェルコマンド実行エラー", addMessage)
-		log.Fatal("Judge system done, but WA.")
+		log.Panic("Judge system done, but WA.")
 	}
 	fmt.Println(string(output))
 }
@@ -63,7 +63,7 @@ func testCase() []string {
 	file, err := os.Open("sample.txt")
 	if err != nil {
 		fmt.Println(err)
-		log.Fatal("err2: エラーを書き込むファイル展開に失敗")
+		log.Panic("err2: エラーを書き込むファイル展開に失敗")
 	}
 	defer file.Close()
 
@@ -72,7 +72,7 @@ func testCase() []string {
 	size, err := strconv.Atoi(sc.Text())
 	if err != nil {
 		fmt.Println(err)
-		log.Fatal("err3: 入力文字をint型に変換失敗")
+		log.Panic("err3: 入力文字をint型に変換失敗")
 	}
 
 	sample := make([]string, size)
@@ -89,7 +89,7 @@ func testCase() []string {
 	}
 
 	if err := sc.Err(); err != nil {
-		log.Fatal("err4: テストケース読み込みエラー")
+		log.Panic("err4: テストケース読み込みエラー")
 	}
 
 	return sample
